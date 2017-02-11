@@ -1,12 +1,16 @@
 #include "tm4c123gh6pm.h"
-
+#include "stdint.h"
 void EnableI2CModule0(void);
+uint8_t ReadRegister(uint8_t RegisterAddress);
 void PLL_Init(void);
-
+volatile uint8_t X_Axis1,X_Axis2=0;
 int main()
 {
 	PLL_Init();
 	EnableI2CModule0();
+	X_Axis1 = ReadRegister(0x36);
+	X_Axis2 = ReadRegister(0x37);
+	while(1);
 }
 void PLL_Init(void){
   // 0) Use RCC2
@@ -38,19 +42,22 @@ void EnableI2CModule0(void)
 	Delay = SYSCTL_RCGCGPIO_R; //delay allow clock to stabilize 
 	GPIO_PORTB_AFSEL_R|= 0x0000000C; //enable alternate functions for PB2 and PB3
 	GPIO_PORTB_ODR_R |= 0x00000008; //set PB3 (I2C SDA)  for open drain
-	GPIO_PORTB_DEN_R |= 0xFF;
-	//might need to add digital enable here or before setting open drain 
+	GPIO_PORTB_DEN_R |= 0xFF; //Enable digital on Port B
 	GPIO_PORTB_PCTL_R |=0x03;
 	I2C0_PP_R |= 0x01;
 	I2C0_MTPR_R |= 0x00000027; //set SCL clock
 	I2C0_MCR_R |= 0x00000010; //intialize mcr rigester with that value given in datasheet
-	//end intialization code after this is sending code
-	I2C0_MSA_R = 0x000000A6; //set slave address
-	I2C0_MDR_R = 0x00000000; //place data to send mdr register
+}
+uint8_t ReadRegister(uint8_t RegisterAddress)
+{
+	volatile uint8_t result=0;
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = RegisterAddress; //place data to send mdr register
 	I2C0_MCS_R = 0x00000007; //stop start run
 	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
-	I2C0_MSA_R = 0x000000A7;
-	I2C0_MCS_R = 0x00000007;
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
 	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
-	I2C0_MCS_R = 0x00000004;
+	result = I2C0_MDR_R;
+	return result;
 }
