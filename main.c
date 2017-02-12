@@ -17,6 +17,7 @@ int main()
 	temp=ReadRegister(0x2D);
 	WriteRegister(0x31,0x0B);
 	temp=ReadRegister(0x31);	
+
 	while(1)
 	{
 		X_Axis1=ReadRegister(0x32);
@@ -60,31 +61,33 @@ void EnableI2CModule0(void)
 	GPIO_PORTB_DEN_R |= 0xFF; //Enable digital on Port B
 	GPIO_PORTB_PCTL_R |=0x03;
 	I2C0_PP_R |= 0x01;
-	I2C0_MTPR_R |= 0x00000027; //set SCL clock
+	I2C0_MTPR_R = 0x00000039; //set SCL clock
 	I2C0_MCR_R |= 0x00000010; //intialize mcr rigester with that value given in datasheet
 }
 uint8_t ReadRegister(uint8_t RegisterAddress)
 {
+	volatile uint32_t mcs = I2C0_MCS_R ;
 	volatile uint8_t result=0;
 	I2C0_MSA_R = 0x000000A6; //write operation
 	I2C0_MDR_R = RegisterAddress; //place data to send mdr register
 	I2C0_MCS_R = 0x00000007; //stop start run
-	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
 	I2C0_MSA_R = 0x000000A7; // read operation
 	I2C0_MCS_R = 0x00000007; // stop start run
-	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
 	result = I2C0_MDR_R;
 	return result;
 }
 
 void WriteRegister(uint8_t RegisterAddress,uint8_t Data)
 {
+	volatile uint32_t mcs = I2C0_MCS_R ;
 	I2C0_MSA_R = 0x000000A6; //write operation
 	I2C0_MDR_R = RegisterAddress; //place register address to set in mdr register
 	I2C0_MCS_R = 0x00000003; //burst send ( multiple bytes send ) 
-	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
 	I2C0_MDR_R = Data; //place data to be sent in  mdr register
 	I2C0_MCS_R = 0x00000005; // transmit followed by stop state 
-	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
 }
 
