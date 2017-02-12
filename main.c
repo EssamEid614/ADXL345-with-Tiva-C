@@ -1,16 +1,31 @@
 #include "tm4c123gh6pm.h"
 #include "stdint.h"
+
 void EnableI2CModule0(void);
 uint8_t ReadRegister(uint8_t RegisterAddress);
 void PLL_Init(void);
-volatile uint8_t X_Axis1,X_Axis2=0;
-int main()
+void WriteRegister(uint8_t RegisterAddress,uint8_t Data);
+volatile uint8_t X_Axis1,X_Axis2,Y_Axis1,Y_Axis2,Z_Axis1,Z_Axis2=0;
+
+int main()	
 {
+	volatile long temp;
 	PLL_Init();
 	EnableI2CModule0();
-	X_Axis1 = ReadRegister(0x36);
-	X_Axis2 = ReadRegister(0x37);
-	while(1);
+	temp=ReadRegister(0x00);
+	WriteRegister(0x2D,0x08);
+	temp=ReadRegister(0x2D);
+	WriteRegister(0x31,0x0B);
+	temp=ReadRegister(0x31);	
+	while(1)
+	{
+		X_Axis1=ReadRegister(0x32);
+		X_Axis2=ReadRegister(0x33);
+		Y_Axis1=ReadRegister(0x34);
+		Y_Axis2=ReadRegister(0x35);
+		Z_Axis1=ReadRegister(0x36);
+		Z_Axis2=ReadRegister(0x37);
+	}
 }
 void PLL_Init(void){
   // 0) Use RCC2
@@ -61,3 +76,15 @@ uint8_t ReadRegister(uint8_t RegisterAddress)
 	result = I2C0_MDR_R;
 	return result;
 }
+
+void WriteRegister(uint8_t RegisterAddress,uint8_t Data)
+{
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = RegisterAddress; //place register address to set in mdr register
+	I2C0_MCS_R = 0x00000003; //burst send ( multiple bytes send ) 
+	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+	I2C0_MDR_R = Data; //place data to be sent in  mdr register
+	I2C0_MCS_R = 0x00000005; // transmit followed by stop state 
+	while((I2C0_MCS_R &= 0x00000040)==1); //poll busy bit 
+}
+

@@ -216,15 +216,15 @@ Image Symbol Table
     .ARM.Collect$$rtexit$$00000004           0x00000318   Section        6  rtexit2.o(.ARM.Collect$$rtexit$$00000004)
     .text                                    0x00000320   Section       48  startup.o(.text)
     .text                                    0x00000350   Section        0  main.o(.text)
-    .text                                    0x000004d4   Section        0  heapauxi.o(.text)
-    .text                                    0x000004da   Section       74  sys_stackheap_outer.o(.text)
-    .text                                    0x00000524   Section        0  exit.o(.text)
-    .text                                    0x00000530   Section        8  libspace.o(.text)
-    .text                                    0x00000538   Section        0  sys_exit.o(.text)
-    .text                                    0x00000544   Section        2  use_no_semi.o(.text)
-    .text                                    0x00000546   Section        0  indicate_semi.o(.text)
-    .data                                    0x20000000   Section        2  main.o(.data)
-    .bss                                     0x20000004   Section       96  libspace.o(.bss)
+    .text                                    0x00000574   Section        0  heapauxi.o(.text)
+    .text                                    0x0000057a   Section       74  sys_stackheap_outer.o(.text)
+    .text                                    0x000005c4   Section        0  exit.o(.text)
+    .text                                    0x000005d0   Section        8  libspace.o(.text)
+    .text                                    0x000005d8   Section        0  sys_exit.o(.text)
+    .text                                    0x000005e4   Section        2  use_no_semi.o(.text)
+    .text                                    0x000005e6   Section        0  indicate_semi.o(.text)
+    .data                                    0x20000000   Section        6  main.o(.data)
+    .bss                                     0x20000008   Section       96  libspace.o(.bss)
     HEAP                                     0x20000068   Section        0  startup.o(HEAP)
     STACK                                    0x20000068   Section     1024  startup.o(STACK)
     HeapMem                                  0x20000068   Data           0  startup.o(HEAP)
@@ -441,27 +441,32 @@ Image Symbol Table
     WaitForInterrupt                         0x00000337   Thumb Code     0  startup.o(.text)
     __user_initial_stackheap                 0x0000033b   Thumb Code     0  startup.o(.text)
     ReadRegister                             0x00000351   Thumb Code    80  main.o(.text)
-    EnableI2CModule0                         0x000003a1   Thumb Code   138  main.o(.text)
-    PLL_Init                                 0x0000042b   Thumb Code   106  main.o(.text)
-    main                                     0x00000495   Thumb Code    32  main.o(.text)
-    __use_two_region_memory                  0x000004d5   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_escrow$2region                 0x000004d7   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_expand$2region                 0x000004d9   Thumb Code     2  heapauxi.o(.text)
-    __user_setup_stackheap                   0x000004db   Thumb Code    74  sys_stackheap_outer.o(.text)
-    exit                                     0x00000525   Thumb Code    12  exit.o(.text)
-    __user_libspace                          0x00000531   Thumb Code     8  libspace.o(.text)
-    __user_perproc_libspace                  0x00000531   Thumb Code     0  libspace.o(.text)
-    __user_perthread_libspace                0x00000531   Thumb Code     0  libspace.o(.text)
-    _sys_exit                                0x00000539   Thumb Code     8  sys_exit.o(.text)
-    __I$use$semihosting                      0x00000545   Thumb Code     0  use_no_semi.o(.text)
-    __use_no_semihosting_swi                 0x00000545   Thumb Code     2  use_no_semi.o(.text)
-    __semihosting_library_function           0x00000547   Thumb Code     0  indicate_semi.o(.text)
-    Region$$Table$$Base                      0x00000548   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000568   Number         0  anon$$obj.o(Region$$Table)
-    X_Axis2                                  0x20000000   Data           1  main.o(.data)
+    WriteRegister                            0x000003a1   Thumb Code    60  main.o(.text)
+    EnableI2CModule0                         0x000003dd   Thumb Code   138  main.o(.text)
+    PLL_Init                                 0x00000467   Thumb Code   106  main.o(.text)
+    main                                     0x000004d1   Thumb Code   114  main.o(.text)
+    __use_two_region_memory                  0x00000575   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_escrow$2region                 0x00000577   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_expand$2region                 0x00000579   Thumb Code     2  heapauxi.o(.text)
+    __user_setup_stackheap                   0x0000057b   Thumb Code    74  sys_stackheap_outer.o(.text)
+    exit                                     0x000005c5   Thumb Code    12  exit.o(.text)
+    __user_libspace                          0x000005d1   Thumb Code     8  libspace.o(.text)
+    __user_perproc_libspace                  0x000005d1   Thumb Code     0  libspace.o(.text)
+    __user_perthread_libspace                0x000005d1   Thumb Code     0  libspace.o(.text)
+    _sys_exit                                0x000005d9   Thumb Code     8  sys_exit.o(.text)
+    __I$use$semihosting                      0x000005e5   Thumb Code     0  use_no_semi.o(.text)
+    __use_no_semihosting_swi                 0x000005e5   Thumb Code     2  use_no_semi.o(.text)
+    __semihosting_library_function           0x000005e7   Thumb Code     0  indicate_semi.o(.text)
+    Region$$Table$$Base                      0x000005e8   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00000608   Number         0  anon$$obj.o(Region$$Table)
+    Z_Axis2                                  0x20000000   Data           1  main.o(.data)
     X_Axis1                                  0x20000001   Data           1  main.o(.data)
-    __libspace_start                         0x20000004   Data          96  libspace.o(.bss)
-    __temporary_stack_top$libspace           0x20000064   Data           0  libspace.o(.bss)
+    X_Axis2                                  0x20000002   Data           1  main.o(.data)
+    Y_Axis1                                  0x20000003   Data           1  main.o(.data)
+    Y_Axis2                                  0x20000004   Data           1  main.o(.data)
+    Z_Axis1                                  0x20000005   Data           1  main.o(.data)
+    __libspace_start                         0x20000008   Data          96  libspace.o(.bss)
+    __temporary_stack_top$libspace           0x20000068   Data           0  libspace.o(.bss)
 
 
 
@@ -471,9 +476,9 @@ Memory Map of the image
 
   Image Entry point : 0x0000026d
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x0000056c, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000610, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Base: 0x00000000, Size: 0x00000568, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Base: 0x00000000, Size: 0x00000608, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -524,31 +529,30 @@ Memory Map of the image
     0x00000318   0x00000006   Code   RO          117    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x0000031e   0x00000002   PAD
     0x00000320   0x00000030   Code   RO            4    .text               startup.o
-    0x00000350   0x00000184   Code   RO           12    .text               main.o
-    0x000004d4   0x00000006   Code   RO           36    .text               c_w.l(heapauxi.o)
-    0x000004da   0x0000004a   Code   RO           56    .text               c_w.l(sys_stackheap_outer.o)
-    0x00000524   0x0000000c   Code   RO           58    .text               c_w.l(exit.o)
-    0x00000530   0x00000008   Code   RO           66    .text               c_w.l(libspace.o)
-    0x00000538   0x0000000c   Code   RO          125    .text               c_w.l(sys_exit.o)
-    0x00000544   0x00000002   Code   RO          136    .text               c_w.l(use_no_semi.o)
-    0x00000546   0x00000000   Code   RO          138    .text               c_w.l(indicate_semi.o)
-    0x00000546   0x00000002   PAD
-    0x00000548   0x00000020   Data   RO          190    Region$$Table       anon$$obj.o
+    0x00000350   0x00000224   Code   RO           12    .text               main.o
+    0x00000574   0x00000006   Code   RO           36    .text               c_w.l(heapauxi.o)
+    0x0000057a   0x0000004a   Code   RO           56    .text               c_w.l(sys_stackheap_outer.o)
+    0x000005c4   0x0000000c   Code   RO           58    .text               c_w.l(exit.o)
+    0x000005d0   0x00000008   Code   RO           66    .text               c_w.l(libspace.o)
+    0x000005d8   0x0000000c   Code   RO          125    .text               c_w.l(sys_exit.o)
+    0x000005e4   0x00000002   Code   RO          136    .text               c_w.l(use_no_semi.o)
+    0x000005e6   0x00000000   Code   RO          138    .text               c_w.l(indicate_semi.o)
+    0x000005e6   0x00000002   PAD
+    0x000005e8   0x00000020   Data   RO          190    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Base: 0x20000000, Size: 0x00000004, Max: 0xffffffff, ABSOLUTE)
-
-    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x20000000   0x00000002   Data   RW           13    .data               main.o
-
-
-    Execution Region ER_ZI (Base: 0x20000004, Size: 0x00000464, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Base: 0x20000000, Size: 0x00000008, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000004   0x00000060   Zero   RW           67    .bss                c_w.l(libspace.o)
-    0x20000064   0x00000004   PAD
+    0x20000000   0x00000006   Data   RW           13    .data               main.o
+
+
+    Execution Region ER_ZI (Base: 0x20000008, Size: 0x00000460, Max: 0xffffffff, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20000008   0x00000060   Zero   RW           67    .bss                c_w.l(libspace.o)
     0x20000068   0x00000000   Zero   RW            2    HEAP                startup.o
     0x20000068   0x00000400   Zero   RW            1    STACK               startup.o
 
@@ -560,11 +564,11 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       388         32          0          2          0       5680   main.o
+       548         50          0          6          0       6114   main.o
        692        632          0          0       1024        876   startup.o
 
     ----------------------------------------------------------------------
-      1080        664         32          4       1024       6556   Object Totals
+      1240        682         32          8       1024       6990   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          0          0          0          2          0          0   (incl. Padding)
 
@@ -594,8 +598,8 @@ Image component sizes
          2          0          0          0          0         68   use_no_semi.o
 
     ----------------------------------------------------------------------
-       272         16          0          0        100        576   Library Totals
-         6          0          0          0          4          0   (incl. Padding)
+       272         16          0          0         96        576   Library Totals
+         6          0          0          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -604,7 +608,7 @@ Image component sizes
        266         16          0          0         96        576   c_w.l
 
     ----------------------------------------------------------------------
-       272         16          0          0        100        576   Library Totals
+       272         16          0          0         96        576   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -613,15 +617,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      1352        680         32          4       1124       6768   Grand Totals
-      1352        680         32          4       1124       6768   ELF Image Totals
-      1352        680         32          4          0          0   ROM Totals
+      1512        698         32          8       1120       7202   Grand Totals
+      1512        698         32          8       1120       7202   ELF Image Totals
+      1512        698         32          8          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 1384 (   1.35kB)
+    Total RO  Size (Code + RO Data)                 1544 (   1.51kB)
     Total RW  Size (RW Data + ZI Data)              1128 (   1.10kB)
-    Total ROM Size (Code + RO Data + RW Data)       1388 (   1.36kB)
+    Total ROM Size (Code + RO Data + RW Data)       1552 (   1.52kB)
 
 ==============================================================================
 
