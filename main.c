@@ -1,46 +1,48 @@
+//Author : Essam Eid
+//version : Rev 0.1
+// Copyright   : Your copyright notice
+// Description : Tiva C with ADXL 345 for measuring acceleration
+//this is a sample code which shows how to interface the ADXL 345 with the TIVA C microcontroller using I2C protocol
+
 #include "tm4c123gh6pm.h"
 #include "stdint.h"
+#include "math.h"
+#include "I2C.h"
 
-void EnableI2CModule0(void);
-int8_t ReadRegister(int8_t RegisterAddress);
+
+
 void PLL_Init(void);
 void WriteRegister(int8_t RegisterAddress,int8_t Data);
 int16_t ReadAccelX(void);
 int16_t ReadAccelY(void);
 int16_t ReadAccelZ(void);
-volatile float X_Axis1,X_Axis2,Y_Axis1,Y_Axis2,Z_Axis1,Z_Axis2=0;
-volatile int16_t RawX_Axis1,RawX_Axis2,RawY_Axis1,RawY_Axis2,RawZ_Axis1,RawZ_Axis2=0;
+void Timer_Init(void);
+void StartTimer(void);
+int GetVelocity(void);
+volatile float X_Axis1=0,X_Axis2=0,Y_Axis1=0,Y_Axis2=0,Z_Axis1=0,Z_Axis2=0;
+volatile int16_t RawX_Axis1=0,RawX_Axis2=0,RawY_Axis1=0,RawY_Axis2=0,RawZ_Axis1=0,RawZ_Axis2=0;
+volatile long OldV=0,OldA=0,NewA=0,NewV=0;
 
 int main()	
 {
 	volatile long temp;
 	PLL_Init();
-	EnableI2CModule0();
-	temp=ReadRegister(0x00);
-	WriteRegister(0x31,0x0B);
-	temp=ReadRegister(0x31);	
-	WriteRegister(0x2D,0x08);
+	Timer_Init();
+	StartTimer();
+	EnableI2CModule0(); // Enable module I2C9
+	temp=ReadRegister(0x00); // testing to see if returns E5 communication is successful
+	WriteRegister(0x31,0x0B); // setting resolution 
+	temp=ReadRegister(0x31);
+	WriteRegister(0x2D,0x08); // disable sleep mode	 
 	temp=ReadRegister(0x2D);
 	while(1)
 	{
-		/*X_Axis1 = RawX_Axis1 * 0.00390625;
-		RawX_Axis2=ReadRegister(0x33);
-		X_Axis2 = RawX_Axis2 * 0.00390625;
-		RawY_Axis1=ReadRegister(0x34);
-		Y_Axis1 = RawY_Axis1 * 0.00390625;
-		RawY_Axis2=ReadRegister(0x35);
-		Y_Axis2 = RawY_Axis2 * 0.00390625;
-		RawZ_Axis1=ReadRegister(0x36);
-		Z_Axis1 = RawZ_Axis1 * 0.00390625;
-		RawZ_Axis2=ReadRegister(0x37);
-		Z_Axis2 = RawZ_Axis2 * 0.00390625;
-		*/
 		RawX_Axis1=ReadAccelX();
 		X_Axis1 = RawX_Axis1 * 0.00390625;
 		RawY_Axis1=ReadAccelY();
 		Y_Axis1 = RawY_Axis1 * 0.00390625;
 		RawZ_Axis1=ReadAccelZ();
-		Z_Axis1 = (RawY_Axis1 * 0.00390625)+1;
+		Z_Axis1 = (RawY_Axis1 * 0.00390625)+0.96;
 	}
 }
 void PLL_Init(void){
@@ -76,7 +78,7 @@ void EnableI2CModule0(void)
 	GPIO_PORTB_DEN_R |= 0xFF; //Enable digital on Port B
 	GPIO_PORTB_PCTL_R |=0x03;
 	I2C0_PP_R |= 0x01;
-	I2C0_MTPR_R = 0x00000039; //set SCL clock
+	I2C0_MTPR_R = 0x00000039; //set SCL clock ( change this if u plan to run on 16 MHZ ) 
 	I2C0_MCR_R |= 0x00000010; //intialize mcr rigester with that value given in datasheet
 }
 int8_t ReadRegister(int8_t RegisterAddress)
@@ -182,4 +184,39 @@ int16_t ReadAccelZ(void)
 	result = result | LSB;
 	result = result | MSB;
 return result;	
+}
+void Timer_Init(void)
+{
+	SYSCTL_RCGCTIMER_R |= 0x00000002; // enable timer module clock
+	TIMER1_CTL_R &=0xFFFFFFFE; // clear enable bit 
+	TIMER1_CFG_R &=0x8; // setting to one shot timer mode
+	TIMER1_TAMR_R  |= 0x00000001; // setting to one shot timer mode
+	TIMER1_TAILR_R = 0x04C4B400; //preload the value with this for 1 second , u can preload with 0xF42400 when using 16 MHZ clock	
+}
+void StartTimer(void)
+{
+	TIMER1_CTL_R |=0x0F; // start timer ( set enable bit ) needs fixing should be 01 will look at it later
+}
+int GetVelocity(void)
+{
+	volatile float X_AxisV=0,Y_AxisV=0,Z_AxisV=0;
+	RawX_Axis1=ReadAccelX();
+	X_Axis1 = RawX_Axis1 * 0.00390625;
+	RawY_Axis1=ReadAccelY();
+	Y_Axis1 = RawY_Axis1 * 0.00390625;
+	//RawZ_Axis1=ReadAccelZ();
+	//Z_Axis1 = (RawY_Axis1 * 0.00390625)+0.96;
+	OldA=sqrt((X_Axis1*X_Axis1)+(Y_Axis1*Y_Axis1));
+	StartTimer();
+	while((TIMER1_RIS_R & 0xFFFFFFFF)==0);
+	RawX_Axis1=ReadAccelX();
+	X_Axis1 = RawX_Axis1 * 0.00390625;
+	RawY_Axis1=ReadAccelY();
+	Y_Axis1 = RawY_Axis1 * 0.00390625;
+	//RawZ_Axis1=ReadAccelZ();
+	//Z_Axis1 = (RawY_Axis1 * 0.00390625)+0.96;
+	NewA=sqrt((X_Axis1*X_Axis1)+(Y_Axis1*Y_Axis1));
+	NewV=OldV+((NewA+OldA)/2);
+	OldV=NewV;
+	return NewV;
 }
