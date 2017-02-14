@@ -2,10 +2,14 @@
 #include "stdint.h"
 
 void EnableI2CModule0(void);
-uint8_t ReadRegister(uint8_t RegisterAddress);
+int8_t ReadRegister(int8_t RegisterAddress);
 void PLL_Init(void);
-void WriteRegister(uint8_t RegisterAddress,uint8_t Data);
-volatile uint8_t X_Axis1,X_Axis2,Y_Axis1,Y_Axis2,Z_Axis1,Z_Axis2=0;
+void WriteRegister(int8_t RegisterAddress,int8_t Data);
+int16_t ReadAccelX(void);
+int16_t ReadAccelY(void);
+int16_t ReadAccelZ(void);
+volatile float X_Axis1,X_Axis2,Y_Axis1,Y_Axis2,Z_Axis1,Z_Axis2=0;
+volatile int16_t RawX_Axis1,RawX_Axis2,RawY_Axis1,RawY_Axis2,RawZ_Axis1,RawZ_Axis2=0;
 
 int main()	
 {
@@ -13,19 +17,30 @@ int main()
 	PLL_Init();
 	EnableI2CModule0();
 	temp=ReadRegister(0x00);
-	WriteRegister(0x2D,0x08);
-	temp=ReadRegister(0x2D);
 	WriteRegister(0x31,0x0B);
 	temp=ReadRegister(0x31);	
-
+	WriteRegister(0x2D,0x08);
+	temp=ReadRegister(0x2D);
 	while(1)
 	{
-		X_Axis1=ReadRegister(0x32);
-		X_Axis2=ReadRegister(0x33);
-		Y_Axis1=ReadRegister(0x34);
-		Y_Axis2=ReadRegister(0x35);
-		Z_Axis1=ReadRegister(0x36);
-		Z_Axis2=ReadRegister(0x37);
+		/*X_Axis1 = RawX_Axis1 * 0.00390625;
+		RawX_Axis2=ReadRegister(0x33);
+		X_Axis2 = RawX_Axis2 * 0.00390625;
+		RawY_Axis1=ReadRegister(0x34);
+		Y_Axis1 = RawY_Axis1 * 0.00390625;
+		RawY_Axis2=ReadRegister(0x35);
+		Y_Axis2 = RawY_Axis2 * 0.00390625;
+		RawZ_Axis1=ReadRegister(0x36);
+		Z_Axis1 = RawZ_Axis1 * 0.00390625;
+		RawZ_Axis2=ReadRegister(0x37);
+		Z_Axis2 = RawZ_Axis2 * 0.00390625;
+		*/
+		RawX_Axis1=ReadAccelX();
+		X_Axis1 = RawX_Axis1 * 0.00390625;
+		RawY_Axis1=ReadAccelY();
+		Y_Axis1 = RawY_Axis1 * 0.00390625;
+		RawZ_Axis1=ReadAccelZ();
+		Z_Axis1 = (RawY_Axis1 * 0.00390625)+1;
 	}
 }
 void PLL_Init(void){
@@ -64,10 +79,10 @@ void EnableI2CModule0(void)
 	I2C0_MTPR_R = 0x00000039; //set SCL clock
 	I2C0_MCR_R |= 0x00000010; //intialize mcr rigester with that value given in datasheet
 }
-uint8_t ReadRegister(uint8_t RegisterAddress)
+int8_t ReadRegister(int8_t RegisterAddress)
 {
-	volatile uint32_t mcs = I2C0_MCS_R ;
-	volatile uint8_t result=0;
+	volatile int32_t mcs = I2C0_MCS_R ;
+	volatile int8_t result=0;
 	I2C0_MSA_R = 0x000000A6; //write operation
 	I2C0_MDR_R = RegisterAddress; //place data to send mdr register
 	I2C0_MCS_R = 0x00000007; //stop start run
@@ -79,9 +94,9 @@ uint8_t ReadRegister(uint8_t RegisterAddress)
 	return result;
 }
 
-void WriteRegister(uint8_t RegisterAddress,uint8_t Data)
+void WriteRegister(int8_t RegisterAddress,int8_t Data)
 {
-	volatile uint32_t mcs = I2C0_MCS_R ;
+	volatile int32_t mcs = I2C0_MCS_R ;
 	I2C0_MSA_R = 0x000000A6; //write operation
 	I2C0_MDR_R = RegisterAddress; //place register address to set in mdr register
 	I2C0_MCS_R = 0x00000003; //burst send ( multiple bytes send ) 
@@ -90,4 +105,81 @@ void WriteRegister(uint8_t RegisterAddress,uint8_t Data)
 	I2C0_MCS_R = 0x00000005; // transmit followed by stop state 
 	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
 }
-
+int16_t ReadAccelX(void)
+{
+	volatile int16_t result=0,LSB=0,MSB=0;
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x32; //data x0
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	LSB = I2C0_MDR_R;
+	//result above is LSB of accel x
+	//repeat to get MSB
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x33; //data x1
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit
+	MSB=I2C0_MDR_R;
+	MSB= MSB <<8;
+	result = result | LSB;
+	result = result | MSB;
+return result;	
+}
+int16_t ReadAccelY(void)
+{
+	volatile int16_t result=0,LSB=0,MSB=0;
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x34; //data Y0
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	LSB = I2C0_MDR_R;
+	//result above is LSB of accel Y
+	//repeat to get MSB
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x35; //data Y1
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit
+	MSB=I2C0_MDR_R;
+	MSB= MSB <<8;
+	result = result | LSB;
+	result = result | MSB;
+return result;	
+}
+int16_t ReadAccelZ(void)
+{
+	volatile int16_t result=0,LSB=0,MSB=0;
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x36; //data Z0
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	LSB = I2C0_MDR_R;
+	//result above is LSB of accel Z
+	//repeat to get MSB
+	I2C0_MSA_R = 0x000000A6; //write operation
+	I2C0_MDR_R = 0x37; //data xZ1
+	I2C0_MCS_R = 0x00000007; //stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit 
+	I2C0_MSA_R = 0x000000A7; // read operation
+	I2C0_MCS_R = 0x00000007; // stop start run
+	while((I2C0_MCS_R & 0x00000001)==1); //poll busy bit
+	MSB=I2C0_MDR_R;
+	MSB= MSB <<8;
+	result = result | LSB;
+	result = result | MSB;
+return result;	
+}
